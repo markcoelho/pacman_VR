@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Controller Sphere Movement and Jump</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    
+ 
+    
+  </head>
+  <body>
+    <a-scene vr-mode-ui="enabled: true">
+      <!-- Add lighting -->
+      <a-light type="ambient" color="#888"></a-light>
+      <a-light type="directional" color="#fff" position="1 1 1"></a-light>
+      <!-- Ground -->
+      <a-plane id="ground" position="0 -0.05 0" rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane>
+      <!-- Controller 1 (Left Hand) -->
+      <a-entity id="controller1" tracked-controls="controller: 0; hand: left;"></a-entity>
+      <!-- Controller 2 (Right Hand) -->
+      <a-entity id="controller2" tracked-controls="controller: 1; hand: right;"></a-entity>
+      <!-- Parent Entity for Character (Grouping the camera and two spheres) -->
+      <a-entity id="character" position="0 1.6 0">
+        <!-- VR Camera (Head of the character) -->
+        <a-camera id="cameraHead" position="0 0 0"></a-camera>
+        <!-- Sphere for Left Hand -->
+        <a-entity id="sphereLeft" geometry="primitive: sphere; radius: 0.1" material="color: blue" position="0 -0.05 0"></a-entity>
+        <!-- Sphere for Right Hand -->
+        <a-entity id="sphereRight" geometry="primitive: sphere; radius: 0.1" material="color: green" position="0 -0.05 0"></a-entity>
+      </a-entity>
+    </a-scene>
+    <script>
+      AFRAME.registerComponent('track-controllers', {
+        schema: {
+          isJumping: { default: false },
+          velocityY: { default: 0 },
+          initialTouchLeft: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
+          initialTouchRight: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }
+        },
+        init: function () {
+          const el = this.el;
+          const character = document.querySelector("#character");
+          // Listen for the spacebar key press to trigger jump
+          window.addEventListener('keydown', (event) => {
+            if (event.code === 'Space' && !this.data.isJumping) {
+              this.data.isJumping = true;
+              this.data.velocityY = 0.1;
+            }
+          });
+        },
+        tick: function () {
+          const controllerLeft = document.querySelector("#controller1");
+          const controllerRight = document.querySelector("#controller2");
+          const sphereLeft = document.querySelector("#sphereLeft");
+          const sphereRight = document.querySelector("#sphereRight");
+          const character = document.querySelector("#character");
+          const ground = document.querySelector("#ground");
+
+          // Helper function to check if a sphere is in contact with the ground
+          function isContactingGround(sphere, ground) {
+            return sphere.object3D.position.y <= ground.object3D.position.y + 0.05;
+          }
+
+          // Process left hand sphere movement
+          if (controllerLeft && controllerLeft.object3D && sphereLeft.object3D) {
+            const positionLeft = controllerLeft.object3D.position;
+            sphereLeft.object3D.position.set(positionLeft.x, Math.max(positionLeft.y, 0), positionLeft.z);
+
+            if (isContactingGround(sphereLeft, ground)) {
+              // Save initial position on contact
+              if (!this.data.initialTouchLeft.x && !this.data.initialTouchLeft.z) {
+                this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
+              }
+              // Calculate movement delta in reverse
+              const deltaX = this.data.initialTouchLeft.x - positionLeft.x;
+              const deltaZ = this.data.initialTouchLeft.z - positionLeft.z;
+              character.object3D.position.x += deltaX * 2;
+              character.object3D.position.z += deltaZ * 2;
+              // Update saved touch position for next movement frame
+              this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
+            } else {
+              // Reset initial position if not touching
+              this.data.initialTouchLeft = { x: 0, z: 0 };
+            }
+          }
+
+          // Process right hand sphere movement
+          if (controllerRight && controllerRight.object3D && sphereRight.object3D) {
+            const positionRight = controllerRight.object3D.position;
+            sphereRight.object3D.position.set(positionRight.x, Math.max(positionRight.y, 0), positionRight.z);
+
+            if (isContactingGround(sphereRight, ground)) {
+              if (!this.data.initialTouchRight.x && !this.data.initialTouchRight.z) {
+                this.data.initialTouchRight = { x: positionRight.x, z: positionRight.z };
+              }
+              const deltaX = this.data.initialTouchRight.x - positionRight.x;
+              const deltaZ = this.data.initialTouchRight.z - positionRight.z;
+              character.object3D.position.x += deltaX * 2;
+              character.object3D.position.z += deltaZ * 2;
+              this.data.initialTouchRight = { x: positionRight.x, z: positionRight.z };
+            } else {
+              this.data.initialTouchRight = { x: 0, z: 0 };
+            }
+          }
+
+          // Gravity and Jump Logic
+          const characterPosition = character.object3D.position;
+          if (this.data.isJumping) {
+            characterPosition.y += this.data.velocityY;
+            this.data.velocityY -= 0.005;
+            if (characterPosition.y <= 1.6) {
+              characterPosition.y = 1.6;
+              this.data.isJumping = false;
+              this.data.velocityY = 0;
+            }
+          } else {
+            characterPosition.y = Math.max(1.6, characterPosition.y - 0.01);
+          }
+        }
+      });
+      document.querySelector('a-scene').setAttribute('track-controllers', '');
+    </script>
+  </body>
+</html>

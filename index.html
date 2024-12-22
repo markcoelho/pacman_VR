@@ -5,32 +5,641 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VR Controller Sphere Movement and Jump</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    
- 
+    <script src="https://unpkg.com/aframe-aabb-collider-component@3.2.2/dist/aframe-aabb-collider-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
     
   </head>
   <body>
+    
     <a-scene vr-mode-ui="enabled: true">
+      <a-sky color="black"></a-sky>
+
+      <a-assets>
+        
+      <audio  preload="auto" crossorigin="anonymous" id="pointsound" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/point.mp3?v=1733015884770" ></audio>
+
+      <audio  preload="auto" crossorigin="anonymous" id="step" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/step.mp3?v=1733012681752" ></audio>
+        
+      <audio  preload="auto" crossorigin="anonymous" id="death" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/death.mp3?v=1733029436935" ></audio> 
+        
+      <audio  preload="auto" lop="true" crossorigin="anonymous" id="powerup" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/powerup.mp3?v=1734401918945" ></audio> 
+        
+        
+        <img id="floorTexture" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/1f.png?v=1732126559919" crossorigin="anonymous">
+        <!-- Add the 3D model -->
+        <a-asset-item id="mapModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/mapa1.glb?v=1732276864027"></a-asset-item>
+        <!-- path 3D model -->
+        <a-asset-item id="pathModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/path1.glb?v=1732278337946"></a-asset-item>
+        
+        <!-- npc 3D model -->
+        <a-asset-item id="npcModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/npc.glb?v=1732277433921"></a-asset-item>
+        
+        <a-asset-item id="npcPink" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/pink.glb?v=1733009325468"></a-asset-item>
+        <a-asset-item id="npcRed" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/red.glb?v=1733009323239"></a-asset-item>
+        <a-asset-item id="npcYellow" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/yellow.glb?v=1733009324191"></a-asset-item>
+        <a-asset-item id="npcBlue" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/blue.glb?v=1733009324983"></a-asset-item>
+        
+        <!--  scared
+          https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/scared.glb?v=1734306744594
+-->
+        
+
+        
+      </a-assets>
+
       <!-- Add lighting -->
       <a-light type="ambient" color="#888"></a-light>
       <a-light type="directional" color="#fff" position="1 1 1"></a-light>
-      <!-- Ground -->
-      <a-plane id="ground" position="0 -0.05 0" rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane>
+
+      <!-- Adjusted Ground Position with Texture -->
+      <a-plane id="ground" position="0 0.8 0" rotation="-90 0 0" width="200" height="200" material="src: #floorTexture; repeat: 200 200;"></a-plane>
+
+      <!-- Add the 3D model to the scene -->
+      <a-entity  gltf-model="#mapModel" position="-9 0.8 5" scale="1 1 1"></a-entity>
+      
+       <!-- Add the path to the scene -->
+      <a-entity nav-mesh class="collidable"  gltf-model="#pathModel" position="-9 -1 5" scale="1 1 1"></a-entity>
+
       <!-- Controller 1 (Left Hand) -->
       <a-entity id="controller1" tracked-controls="controller: 0; hand: left;"></a-entity>
       <!-- Controller 2 (Right Hand) -->
       <a-entity id="controller2" tracked-controls="controller: 1; hand: right;"></a-entity>
-      <!-- Parent Entity for Character (Grouping the camera and two spheres) -->
-      <a-entity id="character" position="0 1.6 0">
-        <!-- VR Camera (Head of the character) -->
-        <a-camera id="cameraHead" position="0 0 0"></a-camera>
-        <!-- Sphere for Left Hand -->
-        <a-entity id="sphereLeft" geometry="primitive: sphere; radius: 0.1" material="color: blue" position="0 -0.05 0"></a-entity>
-        <!-- Sphere for Right Hand -->
-        <a-entity id="sphereRight" geometry="primitive: sphere; radius: 0.1" material="color: green" position="0 -0.05 0"></a-entity>
+      
+      
+      <!-- npc ghost -->
+      <a-entity id="pink" class="npcs" data-aabb-collider-dynamic gltf-model="#npcPink"  position="-33 1.8 -17" scale="0.2 0.2 0.2">
+          <a-entity id="pinkray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
       </a-entity>
+      
+      <!-- npc ghost -->
+      <a-entity id="red" class="npcs" data-aabb-collider-dynamic gltf-model="#npcRed"  position="15 1.8 -17" scale="0.2 0.2 0.2">
+          <a-entity id="redray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      </a-entity>
+      
+      <!-- npc ghost -->
+      <a-entity id="yellow" class="npcs" data-aabb-collider-dynamic gltf-model="#npcYellow"  position="15 1.8 32" scale="0.2 0.2 0.2">
+          <a-entity id="yellowray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      </a-entity>
+      
+      <!-- npc ghost -->
+      <a-entity id="blue" class="npcs" data-aabb-collider-dynamic gltf-model="#npcBlue"  position="-33 1.8 32" scale="0.2 0.2 0.2">
+          <a-entity id="blueray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      </a-entity>
+      
+      
+      
+      <!-- Parent Entity for Character (Grouping the camera and two spheres)   position="-36 0 2" -->
+      <a-entity  id="character" position="-36 0 2" >
+        
+        <a-entity 
+                  id="characterhitbox" 
+                  position="0 2 0" 
+                  material="opacity: 0; color: yellow; transparent: true"  
+                  geometry="primitive: sphere;"
+                  width="1" 
+                  height="2" 
+                  aabb-collider="interval:5;
+                                 enabled:true;
+                                 debug: false;
+                                 objects: .npcs,
+                                 .food"
+                  > </a-entity>
+        
+        <!-- VR Camera (Head of the character) -->
+        <a-entity id="cameraHead" camera look-controls wasd-controls position="0 0 0"> 
+          
+         <a-text
+                 id="score"
+            position="0 -0.12 -0.28"
+                 rotation="-20 0 0"
+            value="SCORE: 0"
+            width="0.4"
+                 color="white"
+                 
+          ></a-text>
+          <a-text
+                 id="food"
+            position="0 -0.05 -0.28"
+                 rotation="-20 0 0"
+            value="FOOD: 0 / 190"
+            width="0.4"
+                 color="white"
+                 
+          ></a-text>
+
+        </a-entity>
+        
+          <a-entity id="camxpos" collider-check raycaster="objects: .collidable; showLine:false;" position="0.3 0 0" rotation="-90 0 0" follow-camera="target: #cameraHead; offsetX: 0.3; offsetY: 0; offsetZ: 0"></a-entity>
+          <a-entity id="camzpos" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 0.3" rotation="-90 0 0" follow-camera="target: #cameraHead; offsetX: 0; offsetY: 0; offsetZ: 0.3"></a-entity>
+          <a-entity id="camxneg" collider-check raycaster="objects: .collidable; showLine:false;" position="-0.3 0 0" rotation="-90 0 0" follow-camera="target: #cameraHead; offsetX: -0.3; offsetY: 0; offsetZ: 0"></a-entity>
+          <a-entity id="camzneg" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -0.3" rotation="-90 0 0" follow-camera="target: #cameraHead; offsetX: 0; offsetY: 0; offsetZ: -0.3"></a-entity>
+          <a-entity id="camcenter" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 0" rotation="-90 0 0" follow-camera="target: #cameraHead; offsetX: 0; offsetY: 0; offsetZ: 0"></a-entity>
+
+        
+        <!-- Sphere for Left Hand -->
+        <a-entity  id="sphereLeft" geometry="primitive: sphere; radius: 0.1" material="color: yellow" position="0 -0.05 0">
+          <a-entity id="leftxpos"  collider-check raycaster="objects: .collidable; showLine:false;" position="0.1 0 0" rotation="-90 0 0"></a-entity>
+          <a-entity id="leftzpos"  collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 0.1" rotation="-90 0 0"></a-entity>
+          <a-entity id="leftxneg"  collider-check raycaster="objects: .collidable; showLine:false;" position="-0.1 0 0" rotation="-90 0 0"></a-entity>
+          <a-entity id="leftzneg"  collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -0.1" rotation="-90 0 0"></a-entity>
+        </a-entity>
+        <!-- Sphere for Right Hand -->
+        <a-entity  id="sphereRight" geometry="primitive: sphere; radius: 0.1" material="color: yellow" position="0 -0.05 0">
+          <a-entity id="rightxpos"  collider-check raycaster="objects: .collidable; showLine:false;" position="0.1 0 0" rotation="-90 0 0"></a-entity>
+          <a-entity id="rightzpos"  collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 0.1" rotation="-90 0 0"></a-entity>
+          <a-entity id="rightxneg"  collider-check raycaster="objects: .collidable; showLine:false;" position="-0.1 0 0" rotation="-90 0 0"></a-entity>
+          <a-entity id="rightzneg"  collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -0.1" rotation="-90 0 0"></a-entity>
+        </a-entity>
+
+      </a-entity>
+              
+      
+          <!--food placer--><!--food placer--><!--food placer--><!--food placer-->
+          <!--<a-entity food-placer id="foodplacer" aabb-collider="interval:5; enabled:true; debug:true; objects: .food"  position="-34 2 -23">
+            <a-entity material="color: red"></a-entity>
+            <a-entity id="foodplacer1"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 0" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer2"  collider-check raycaster="objects: .collidable; showLine:true;" position="0 0 1.6" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer3"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 0" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer4"  collider-check raycaster="objects: .collidable; showLine:true;" position="0 0 -1.6" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer5"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 1.6" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer6"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 1.6" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer7"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 -1.6" rotation="-90 0 0"></a-entity>
+            <a-entity id="foodplacer8"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 -1.6" rotation="-90 0 0"></a-entity>
+          </a-entity> -->
+      
+      <!--foods foods foods foods -->
+      <a-entity id="foods">
+        
+      </a-entity>
+      
+      
+      <a-sound
+        id="stepsound"
+        sound="src:#step; volume: 60; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="pointmakesound"
+        sound="src:#pointsound; volume: 60; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="deathsound"
+        sound="src:#death; volume: 60; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="powerupsound"
+        sound="src:#powerup; volume: 10; poolSize: 42; loop: true"
+      >
+      </a-sound>
+      
+
     </a-scene>
+
     <script>
+     //array to check hand coliders outside the path mesh
+      let raysout = [];
+      
+      
+    AFRAME.registerComponent('follow-camera', {
+  schema: {
+    target: { type: 'selector' },
+    offsetX: { type: 'number', default: 0 },
+    offsetY: { type: 'number', default: 0 },
+    offsetZ: { type: 'number', default: 0 }
+  },
+
+  tick: function () {
+    console.log(raysout);
+    
+    let cameraHead = this.data.target;
+    let element = this.el;
+
+    if (cameraHead) {
+      // Calculate and set the position
+      element.object3D.position.set(
+        cameraHead.object3D.position.x + this.data.offsetX,
+        cameraHead.object3D.position.y + this.data.offsetY,
+        cameraHead.object3D.position.z + this.data.offsetZ
+      );
+    }
+  }
+});
+
+
+        let score=0;
+        let food=0;
+      
+      
+
+      AFRAME.registerComponent('collider-check', {
+        dependencies: ['raycaster'],
+
+        init: function () {
+          this.el.addEventListener('raycaster-intersection', function (event) {
+            if (event.target.id == "camcenter") {
+              blackout(false); // Call remove blackout
+            }
+            
+              const index = raysout.indexOf(event.target.id);
+              if (index > -1) { // Only remove if the element is in the array
+                raysout.splice(index, 1);
+              }
+            
+            //console.log(raysout);
+          });
+
+          this.el.addEventListener('raycaster-intersection-cleared', function (event) {
+            if (event.target.id == "camcenter") {
+              blackout(true); // Call remove blackout
+            }
+            
+            if (event.target.id !="camxpos" && event.target.id !="camzpos" && event.target.id !="camxneg" && event.target.id !="camzneg") {
+              prevcharpos=document.querySelector("#character").object3D.position;
+            }else{
+              document.querySelector("#character").object3D.positio=prevcharpos;
+            }
+            if (!raysout.includes(event.target.id)) { // Only add if the element is not already in the array
+                raysout.push(event.target.id);
+              }
+             //console.log(raysout);
+          });
+        }
+      });
+      
+      
+    function blackout(enable) {
+      if(!dead && !end){
+          const scene = document.querySelector('a-scene');
+          if (scene) {
+              if (enable) {
+                  //console.log("Blackout activated!");
+                  scene.style.backgroundColor = 'black';
+
+                  scene.querySelectorAll('*').forEach(el => {
+                      el.setAttribute('visible', false);
+                  });
+              } else {
+                  //console.log("Blackout removed!");
+                  scene.style.backgroundColor = '';
+
+                  scene.querySelectorAll('*').forEach(el => {
+                      el.setAttribute('visible', true);
+                  });
+              }
+          } else {
+              console.error("A-Frame scene not found!");
+          }
+      }
+    }
+
+          let foodpos=[];
+
+          //velocidades e acelaracoes do personagem
+          let velx=0;
+          let velz=0;
+          
+          let lefthandonsurface=false;
+          let righthandonsurface=false;
+      
+          let headcoliding=false;
+      
+      let prevcharpos;
+      
+      
+      /*init food placer
+          let colide_food=false;
+          let colide_wall=false;
+          let foodplacer = document.querySelector('#foodplacer');
+              let position = foodplacer.object3D.position;
+              position.y-=1;
+          let zmove=false;*/
+
+      
+      // Fetch positions from the food.txt file
+              fetch('food.txt')
+              .then(response => response.json())
+              .then(positions => {
+                // Shuffle positions array to randomize the selection of power pellets
+                positions.sort(() => 0.5 - Math.random());
+
+                // Iterate over each position in the array
+                positions.forEach((pos, index) => {
+                  // Create a new entity for the food item
+                  let food = document.createElement('a-entity');
+                  // Set the position using the coordinates from the file
+                  food.setAttribute('position', `${pos.x} ${1.3} ${pos.z}`);
+
+                  if (index < 5) {
+                    //console.log(pos);
+                    // Make the first 4 foods power pellets
+                    food.setAttribute('geometry', 'primitive: sphere; radius: 0.4'); // Larger size
+                    food.setAttribute('material', 'color: red'); // Red color
+                    food.setAttribute('class', 'food power-pellet'); // Additional identifier
+                  } else {
+                    // Regular food items
+                    food.setAttribute('geometry', 'primitive: sphere; radius: 0.2'); // Regular size
+                    food.setAttribute('material', 'color: #fccba6'); // Regular color
+                    food.setAttribute('class', 'food'); // Regular identifier
+                  }
+
+                  food.setAttribute('data-aabb-collider-dynamic', '');
+
+                  // Append the food entity to the scene
+                  document.querySelector('#foods').appendChild(food);
+                });
+              })
+              .catch(error => console.error('Error fetching food positions:', error));
+
+      
+         let powerup = false;
+          let poweruptimer;
+          let end=false;
+      
+          const scaredModelURL = 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/scared.glb?v=1734306744594';
+          const npcModels = {
+            pink: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/pink.glb?v=1733009325468',
+            red: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/red.glb?v=1733009323239',
+            yellow: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/yellow.glb?v=1733009324191',
+            blue: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/blue.glb?v=1733009324983'
+          };
+
+          AFRAME.registerComponent('tick', {
+            init: function () {
+              this.el.addEventListener('hitstart', function (evt) {
+
+                // Check if the collided object is a food item
+                if (evt.target.className.includes("food")) {
+                  // Increase the food count and score
+                  food++;
+                  score += 10;
+                  document.getElementById('food').setAttribute('value', 'FOOD: ' + food + ' / 190');
+                  document.getElementById('score').setAttribute('value', 'SCORE: ' + score);
+                  evt.target.object3D.position.x = 9999; // Move the food item out of the scene
+
+                  // Play the sound
+                  document.querySelector('#pointmakesound').components.sound.playSound();
+
+                  // Check if the food item is a power pellet
+                  if (evt.target.className.includes("power-pellet")) {
+                    powerup = true; // Enable power-up mode
+                    //console.log("powerup started");
+                    document.querySelector('#powerupsound').components.sound.stopSound();
+                    document.querySelector('#powerupsound').components.sound.playSound();
+                    
+                    // Change NPC models to scared version
+                    document.querySelectorAll('.npcs').forEach(npc => {
+                      npc.setAttribute('gltf-model', scaredModelURL);
+                    });
+
+                    // Clear any existing timer to reset the power-up duration
+                    if (poweruptimer) {
+                      clearTimeout(poweruptimer);
+                    }
+
+                    // Set a timer to turn off power-up mode after 15 seconds from the latest power pellet picked up
+                    poweruptimer = setTimeout(() => {
+                      powerup = false;
+                      //console.log("powerup over");
+                      
+                      document.querySelector('#powerupsound').components.sound.stopSound();
+                      
+                      // Revert NPC models back to their original versions
+                      document.querySelectorAll('.npcs').forEach(npc => {
+                        const npcId = npc.getAttribute('id');
+                        if (npcModels[npcId]) {
+                          npc.setAttribute('gltf-model', npcModels[npcId]);
+                        }
+                      });
+                    }, 15000);
+                  }
+
+                  // Check if the food count reaches 190
+                  if (food >= 190) {
+                    end=true;
+                    showFinalScore();
+                  }
+                }
+                
+                
+                
+
+// Check if the collided object is an NPC
+if (evt.target.className.includes("npcs")) {
+  let npcId = evt.target.getAttribute('id'); // Get the NPC ID
+  let npc = document.getElementById(npcId); // Get the NPC element
+
+  if (powerup && !npc.classList.contains('invisible')) {
+    // Increase the score by 50 points
+    score += 50;
+    document.getElementById('score').setAttribute('value', 'SCORE: ' + score);
+
+    // Make the NPC invisible
+    console.log("Making NPC invisible");
+    npc.object3D.visible = false; // Make it invisible
+    npc.classList.add('invisible'); // Add 'invisible' class
+
+    // Set a timer to make the NPC visible again after 3 seconds
+    setTimeout(() => {
+      console.log("Making NPC visible again");
+      npc.object3D.visible = true; // Make it visible
+      npc.classList.remove('invisible'); // Remove 'invisible' class
+    }, 3000);
+
+    // Play the NPC defeat sound
+    // document.querySelector('#npcsound').components.sound.playSound();
+
+  } else {
+    // If not in power-up mode and NPC is not invisible, Pacman dies
+    if (!npc.classList.contains('invisible')) {
+      console.log("DEAD");
+      character.object3D.position.y = 9999999;
+      document.querySelector('#deathsound').components.sound.playSound();
+      showGameOver();
+    }
+  }
+}
+
+
+                
+              });
+            }
+          });
+
+          function showFinalScore() {
+            const scoreText = document.getElementById('score');
+            const character = document.getElementById('character');
+            character.setAttribute('position', '9999 9999 9999'); // Move the player to a distant position
+
+            // Display the final score
+            scoreText.setAttribute('value', `FINAL SCORE: ${score}`);
+            scoreText.setAttribute('color', 'white');
+
+            // Set a timer to reset the game after 20 seconds
+            setTimeout(() => {
+              resetGame();
+            }, 20000);
+          }
+
+
+      
+      
+      document.querySelector('a-scene').setAttribute('tick', '');
+      let dead=false;
+      function showGameOver() {
+        let countdown = 5;
+        const scoreText = document.getElementById('score');
+        const foodText = document.getElementById('food');
+        dead=true;
+        // Change the color to black and update the text
+        scoreText.setAttribute('color', 'white');
+        const interval = setInterval(() => {
+          if (countdown === 0) {
+            clearInterval(interval);
+            resetGame(); // This should be your game reset logic
+          } else {
+            scoreText.setAttribute('value', `GAME OVER\nRestarting in ${countdown} seconds`);
+            countdown--;
+          }
+        }, 1000);
+      }
+
+
+      function resetGame() {
+          end = false;
+          dead = false;
+          // Reset the score
+          score = 0;
+          food = 0;
+          const scoreText = document.getElementById('score');
+          const foodText = document.getElementById('food');
+          scoreText.setAttribute('color', 'white');
+          scoreText.setAttribute('value', 'SCORE: ' + score);
+          foodText.setAttribute('color', 'white');
+          foodText.setAttribute('value', 'FOOD: ' + food + ' / 190');
+
+          // Reset character position
+          const character = document.getElementById('character');
+          character.setAttribute('position', '-36 0 2');
+
+          // Reset NPC positions
+          document.getElementById('pink').setAttribute('position', '-33 1.8 -17');
+          document.getElementById('red').setAttribute('position', '15 1.8 -17');
+          document.getElementById('yellow').setAttribute('position', '15 1.8 32');
+          document.getElementById('blue').setAttribute('position', '-33 1.8 32');
+
+          // Reset directions and positions
+          direction = { npc: 1, pink: 1, red: 1, yellow: 1, blue: 1 };
+          previouspos = { npc: null, pink: null, red: null, yellow: null, blue: null };
+          velx = 0;
+          velz = 0;
+          lefthandonsurface = false;
+          righthandonsurface = false;
+          headcoliding = false;
+
+          // Reset food items
+          const foods = document.getElementById('foods');
+          while (foods.firstChild) {
+            foods.removeChild(foods.firstChild);
+          }
+
+          // Fetch positions from the food.txt file and create food items
+          fetch('food.txt')
+            .then(response => response.json())
+            .then(positions => {
+              // Shuffle positions array to randomize the selection of power pellets
+              positions.sort(() => 0.5 - Math.random());
+
+              // Iterate over each position in the array
+              positions.forEach((pos, index) => {
+                // Create a new entity for the food item
+                let food = document.createElement('a-entity');
+                // Set the position using the coordinates from the file
+                food.setAttribute('position', `${pos.x} ${1.3} ${pos.z}`);
+
+                if (index < 5) {
+                  //console.log(pos);
+                  // Make the first 4 foods power pellets
+                  food.setAttribute('geometry', 'primitive: sphere; radius: 0.4'); // Larger size
+                  food.setAttribute('material', 'color: red'); // Red color
+                  food.setAttribute('class', 'food power-pellet'); // Additional identifier
+                } else {
+                  // Regular food items
+                  food.setAttribute('geometry', 'primitive: sphere; radius: 0.2'); // Regular size
+                  food.setAttribute('material', 'color: #fccba6'); // Regular color
+                  food.setAttribute('class', 'food'); // Regular identifier
+                }
+
+                food.setAttribute('data-aabb-collider-dynamic', '');
+
+                // Append the food entity to the scene
+                document.querySelector('#foods').appendChild(food);
+              });
+            })
+            .catch(error => console.error('Error fetching food positions:', error));
+        }
+
+
+      
+      //detect out of bounds
+      let outOfBoundsCountdown = 5;
+      let isOutOfBounds = false;
+
+      // Detect out of bounds
+      const timeout = setInterval(() => {
+      const camRaysOut = raysout.filter(ray => ray.includes('cam'));
+
+        if (camRaysOut.length > 4 && !isOutOfBounds && !dead && !end) {
+          isOutOfBounds = true;
+          showOutOfBounds();
+        } else if (camRaysOut.length <= 1) {
+          isOutOfBounds = false;
+        }
+      }, 500);
+
+      function showOutOfBounds() {
+        let countdown = outOfBoundsCountdown;
+        const scoreText = document.getElementById('score');
+        const foodText = document.getElementById('food');
+
+        // Change the color to black and update the text
+        scoreText.setAttribute('color', 'black');
+        const interval = setInterval(() => {
+          if (countdown === 0) {
+            clearInterval(interval);
+            resetCharacterPosition(); // Reset character position
+          } else {
+            scoreText.setAttribute('value', `OUT OF BOUNDS DETECTED\nReturning home in ${countdown} seconds`);
+            countdown--;
+          }
+        }, 1000);
+      }
+
+      function resetCharacterPosition() {
+        // Reset character position to original
+        const character = document.getElementById('character');
+        character.setAttribute('position', '-36 0 2');
+
+        // Reset the score text to default
+        const scoreText = document.getElementById('score');
+        const foodText = document.getElementById('food');
+        scoreText.setAttribute('color', 'white');
+        scoreText.setAttribute('value', 'SCORE: ' + score);
+        foodText.setAttribute('color', 'white');
+        foodText.setAttribute('value', 'FOOD: ' + food + "/ 190");
+      }
+      
+      
+      function stopmoving(){
+                velx=0;
+                velz=0;
+          }
+
+
       AFRAME.registerComponent('track-controllers', {
         schema: {
           isJumping: { default: false },
@@ -38,88 +647,343 @@
           initialTouchLeft: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
           initialTouchRight: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }
         },
-        init: function () {
-          const el = this.el;
-          const character = document.querySelector("#character");
-          // Listen for the spacebar key press to trigger jump
-          window.addEventListener('keydown', (event) => {
-            if (event.code === 'Space' && !this.data.isJumping) {
-              this.data.isJumping = true;
-              this.data.velocityY = 0.1;
-            }
-          });
-        },
         tick: function () {
+          
           const controllerLeft = document.querySelector("#controller1");
           const controllerRight = document.querySelector("#controller2");
           const sphereLeft = document.querySelector("#sphereLeft");
           const sphereRight = document.querySelector("#sphereRight");
           const character = document.querySelector("#character");
           const ground = document.querySelector("#ground");
+          
+          const pink = document.querySelector("#pink");
+          const red = document.querySelector("#red");
+          const yellow = document.querySelector("#yellow");
+          const blue = document.querySelector("#blue");
+
+          npcmovement(pink);
+          npcmovement(red);
+          npcmovement(yellow);
+          npcmovement(blue);
+          
+          
+          // Radius of the spheres
+          const sphereRadius = 0.1;
+
+           //is camera out of bounds?
+          //if not, save curren position
+          //is so, return to revious in bounds position
+          if (raysout.includes("camxpos") || raysout.includes("camzpos") || raysout.includes("camxneg") || raysout.includes("camzneg")) {
+              stopmoving();
+              headcoliding=true;
+              character.object3D.position=prevcharpos;
+            //console.log("true");
+          }else{
+              headcoliding=false;
+              prevcharpos=character.object3D.position;
+          }
+          
+          
+
+          
+          
+          const drag = 0.01;
+          
+          if (!lefthandonsurface && !righthandonsurface) {
+              character.object3D.position.x += velx /100;
+              character.object3D.position.z += velz /100;
+              //console.log(velx, velx);
+          }
+          
+         // drag to velocity
+          velx += (velx > 0) ? -drag : (velx < 0) ? drag : 0;
+          velz += (velz > 0) ? -drag : (velz < 0) ? drag : 0;
+
+          // Ensure velocities approximate to 0
+          velx = (Math.abs(velx) < drag) ? 0 : velx;
+          velz = (Math.abs(velz) < drag) ? 0 : velz;
+
+
 
           // Helper function to check if a sphere is in contact with the ground
           function isContactingGround(sphere, ground) {
-            return sphere.object3D.position.y <= ground.object3D.position.y + 0.05;
+            const sphereBottomY = sphere.object3D.position.y - sphereRadius;
+            return sphereBottomY <= ground.object3D.position.y;
           }
+          
+          
+           // Calculate delta time
+          const deltaTime = (Date.now() - this.data.previousTime) / 1000; // Convert milliseconds to seconds
 
           // Process left hand sphere movement
           if (controllerLeft && controllerLeft.object3D && sphereLeft.object3D) {
-            const positionLeft = controllerLeft.object3D.position;
-            sphereLeft.object3D.position.set(positionLeft.x, Math.max(positionLeft.y, 0), positionLeft.z);
-
-            if (isContactingGround(sphereLeft, ground)) {
-              // Save initial position on contact
-              if (!this.data.initialTouchLeft.x && !this.data.initialTouchLeft.z) {
-                this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
+              const positionLeft = controllerLeft.object3D.position;
+              
+            if (!(raysout.includes("leftxpos") || raysout.includes("leftzpos") || raysout.includes("leftxneg") || raysout.includes("leftzneg"))) {
+                  sphereLeft.object3D.position.set(positionLeft.x, positionLeft.y, positionLeft.z);
+              }else{
+                 lefthandonsurface=true;
+                  stopmoving();
               }
-              // Calculate movement delta in reverse
-              const deltaX = this.data.initialTouchLeft.x - positionLeft.x;
-              const deltaZ = this.data.initialTouchLeft.z - positionLeft.z;
-              character.object3D.position.x += deltaX * 2;
-              character.object3D.position.z += deltaZ * 2;
-              // Update saved touch position for next movement frame
-              this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
-            } else {
-              // Reset initial position if not touching
-              this.data.initialTouchLeft = { x: 0, z: 0 };
-            }
+            
+              if(raysout.includes("leftxpos")) {
+                sphereLeft.object3D.position.set(Math.min(sphereLeft.object3D.position.x, positionLeft.x), positionLeft.y, positionLeft.z);
+              }else if(raysout.includes("leftzpos")) {
+                sphereLeft.object3D.position.set(positionLeft.x, positionLeft.y, Math.min(sphereLeft.object3D.position.z, positionLeft.z));
+              } else if(raysout.includes("leftxneg")) {
+                sphereLeft.object3D.position.set(Math.max(sphereLeft.object3D.position.x, positionLeft.x), positionLeft.y, positionLeft.z);
+              }else if(raysout.includes("leftzneg")) {
+                sphereLeft.object3D.position.set(positionLeft.x, positionLeft.y, Math.max(sphereLeft.object3D.position.z, positionLeft.z));
+              }
+            
+
+              if (isContactingGround(sphereLeft, ground)) {
+                if(!lefthandonsurface){
+                  //playsound
+                  document.querySelector('#stepsound').components.sound.playSound();
+                }
+                  lefthandonsurface = true;
+                    stopmoving();
+
+                  // Prevent moving down further, allow upward movement
+                  sphereLeft.object3D.position.y = Math.max(sphereLeft.object3D.position.y, ground.object3D.position.y + sphereRadius);
+
+                  // Save initial position on contact
+                  if (!this.data.initialTouchLeft.x && !this.data.initialTouchLeft.z) {
+                      this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
+                  }
+
+                  // Calculate movement delta in reverse
+                  const deltaX = this.data.initialTouchLeft.x - positionLeft.x;
+                  const deltaZ = this.data.initialTouchLeft.z - positionLeft.z;
+
+                  // Save the previous position of the character
+                  const previousPosition = { x: character.object3D.position.x, y: character.object3D.position.y, z: character.object3D.position.z };
+
+                  // Update the character's position
+                      character.object3D.position.x += deltaX;
+                      character.object3D.position.z += deltaZ;   
+                
+                if (raysout.includes("camxpos")) {
+                  character.object3D.position.set(Math.min(character.object3D.position.x, previousPosition.x), previousPosition.y, previousPosition.z);
+                } else if (raysout.includes("camzpos")) {
+                  character.object3D.position.set(previousPosition.x, previousPosition.y, Math.min(character.object3D.position.z, previousPosition.z));
+                } else if (raysout.includes("camxneg")) {
+                  character.object3D.position.set(Math.max(character.object3D.position.x, previousPosition.x), previousPosition.y, previousPosition.z);
+                } else if (raysout.includes("camzneg")) {
+                  character.object3D.position.set(previousPosition.x, previousPosition.y, Math.max(character.object3D.position.z, previousPosition.z));
+                }
+                
+                  
+                  // Update saved touch position for the next movement frame
+                  this.data.initialTouchLeft = { x: positionLeft.x, z: positionLeft.z };
+
+                  // Save current time for the next frame
+                  this.data.previousTime = Date.now();
+
+                  // Calculate velocity preserving direction for the left
+                   velx = (character.object3D.position.x - previousPosition.x) / deltaTime;
+                   velz = (character.object3D.position.z - previousPosition.z) / deltaTime;
+                
+              }else {
+                  // Reset initial position if not touching ground
+                  this.data.initialTouchLeft = { x: 0, z: 0 };
+                  lefthandonsurface=false;
+              }
           }
+
 
           // Process right hand sphere movement
           if (controllerRight && controllerRight.object3D && sphereRight.object3D) {
             const positionRight = controllerRight.object3D.position;
-            sphereRight.object3D.position.set(positionRight.x, Math.max(positionRight.y, 0), positionRight.z);
+
+            if (!(raysout.includes("rightxpos") || raysout.includes("rightzpos") || raysout.includes("rightxneg") || raysout.includes("rightzneg"))) {
+              sphereRight.object3D.position.set(positionRight.x, positionRight.y, positionRight.z);
+            }else{
+              righthandonsurface=true;
+              stopmoving();
+            }
+
+            if (raysout.includes("rightxpos")) {
+              sphereRight.object3D.position.set(Math.min(sphereRight.object3D.position.x, positionRight.x), positionRight.y, positionRight.z);
+            } else if (raysout.includes("rightzpos")) {
+              sphereRight.object3D.position.set(positionRight.x, positionRight.y, Math.min(sphereRight.object3D.position.z, positionRight.z));
+            } else if (raysout.includes("rightxneg")) {
+              sphereRight.object3D.position.set(Math.max(sphereRight.object3D.position.x, positionRight.x), positionRight.y, positionRight.z);
+            } else if (raysout.includes("rightzneg")) {
+              sphereRight.object3D.position.set(positionRight.x, positionRight.y, Math.max(sphereRight.object3D.position.z, positionRight.z));
+            }
 
             if (isContactingGround(sphereRight, ground)) {
+              if(!righthandonsurface){
+                  //playsound
+                  document.querySelector('#stepsound').components.sound.playSound();
+                }
+              righthandonsurface = true;
+              stopmoving();
+
+              // Prevent moving down further, allow upward movement
+              sphereRight.object3D.position.y = Math.max(sphereRight.object3D.position.y, ground.object3D.position.y + sphereRadius);
+
+              // Save initial position on contact
               if (!this.data.initialTouchRight.x && !this.data.initialTouchRight.z) {
-                this.data.initialTouchRight = { x: positionRight.x, z: positionRight.z };
+                  this.data.initialTouchRight = { x: positionRight.x, z: positionRight.z };
               }
+
+              // Calculate movement delta in reverse
               const deltaX = this.data.initialTouchRight.x - positionRight.x;
               const deltaZ = this.data.initialTouchRight.z - positionRight.z;
-              character.object3D.position.x += deltaX * 2;
-              character.object3D.position.z += deltaZ * 2;
+
+              // Save the previous position of the character
+                  const previousPosition = { x: character.object3D.position.x, y: character.object3D.position.y, z: character.object3D.position.z };
+
+                  // Update the character's position
+                      character.object3D.position.x += deltaX;
+                      character.object3D.position.z += deltaZ;   
+                
+                if (raysout.includes("camxpos")) {
+                  character.object3D.position.set(Math.min(character.object3D.position.x, previousPosition.x), previousPosition.y, previousPosition.z);
+                } else if (raysout.includes("camzpos")) {
+                  character.object3D.position.set(previousPosition.x, previousPosition.y, Math.min(character.object3D.position.z, previousPosition.z));
+                } else if (raysout.includes("camxneg")) {
+                  character.object3D.position.set(Math.max(character.object3D.position.x, previousPosition.x), previousPosition.y, previousPosition.z);
+                } else if (raysout.includes("camzneg")) {
+                  character.object3D.position.set(previousPosition.x, previousPosition.y, Math.max(character.object3D.position.z, previousPosition.z));
+                }
+
+              // Update saved touch position for the next movement frame
               this.data.initialTouchRight = { x: positionRight.x, z: positionRight.z };
-            } else {
+
+              // Save current time for the next frame
+              this.data.previousTime = Date.now();
+
+              // Calculate velocity preserving direction for the right
+              velx = (character.object3D.position.x - previousPosition.x) / deltaTime;
+              velz = (character.object3D.position.z - previousPosition.z) / deltaTime;
+              
+              
+          }else {
+              // Reset initial position if not touching ground
               this.data.initialTouchRight = { x: 0, z: 0 };
+              righthandonsurface=false;
             }
           }
 
-          // Gravity and Jump Logic
-          const characterPosition = character.object3D.position;
-          if (this.data.isJumping) {
-            characterPosition.y += this.data.velocityY;
-            this.data.velocityY -= 0.005;
-            if (characterPosition.y <= 1.6) {
-              characterPosition.y = 1.6;
-              this.data.isJumping = false;
-              this.data.velocityY = 0;
-            }
-          } else {
-            characterPosition.y = Math.max(1.6, characterPosition.y - 0.01);
-          }
         }
+        
+        //FOOD PLACER FOOD PLACER FOOD PLACER
+          /*
+              //food placer script
+              if(foodplacer.object3D.position.x>20){
+                foodplacer.object3D.position.x=-34;
+                zmove=true;
+                colide_food=true;
+              }
+          
+              if(zmove){
+                foodplacer.object3D.position.z-=0.01;
+                if(colide_food==false){zmove=false;}
+              }else{
+                foodplacer.object3D.position.x+=0.03;
+              }
+          
+              if(colide_food==false && colide_wall==false){
+                let food = document.createElement('a-entity');
+                food.setAttribute('geometry', 'primitive: sphere; radius: 0.2');
+                food.setAttribute('material', 'color: red');
+                food.setAttribute('position', position);
+                
+                // Assuming position is an object with x, y, z properties
+                foodpos.push({x: position.x, y: position.y, z: position.z});
+                console.log(foodpos);
+                
+                
+                food.setAttribute('class', 'food');
+                document.querySelector('#foods').appendChild(food);
+                colide_food=true;
+              }
+
+              this.el.addEventListener('hitstart', function (evt) {
+                colide_food=true;
+                //console.log("colide food "+colide_food);
+              });
+              this.el.addEventListener('hitend', function (evt) {
+                colide_food=false;
+                //console.log("colide food "+colide_food);
+              });
+          
+          
+          
+          //parou de colidir com uma comida, mas está a colidir com uma parede?
+                //se sim, entao nao pode fazer mais comida
+            if (raysout.includes("foodplacer1") ||
+                  raysout.includes("foodplacer2") ||
+                  raysout.includes("foodplacer3") ||
+                  raysout.includes("foodplacer4") ||
+                  raysout.includes("foodplacer5") ||
+                  raysout.includes("foodplacer6") ||
+                  raysout.includes("foodplacer7") ||
+                  raysout.includes("foodplacer8")) {
+                  colide_wall=true;
+                  //console.log("colide wall "+colide_wall);
+                }else{
+                  colide_wall=false;
+                  //console.log("colide wall "+colide_wall);
+                }
+          
+                */
+
+          
       });
       document.querySelector('a-scene').setAttribute('track-controllers', '');
+      
+      
+      
+      const npcvel = 0.03;
+
+      let direction = { npc: 1, pink: 1, red: 1, yellow: 1, blue: 1 };
+      let previouspos = { npc: null, pink: null, red: null, yellow: null, blue: null };
+
+      function npcmovement(npc) {
+        const id = npc.id;
+        const childId = npc.children[0].id;
+        
+        if (raysout.includes(childId)) {
+          
+          npc.object3D.position.copy(previouspos[id]); // Use copy to avoid reference issues
+          let randomInt = Math.floor(Math.random() * 4) + 1; // Generates a random integer from 1 to 4
+          direction[id] = randomInt;
+
+          if (randomInt == 1) {
+            npc.object3D.rotation.y = 0;
+          } else if (randomInt == 2) {
+            npc.object3D.rotation.y = -Math.PI / 2;
+          } else if (randomInt == 3) {
+            npc.object3D.rotation.y = -Math.PI;
+          } else if (randomInt == 4) {
+            npc.object3D.rotation.y = Math.PI / 2;
+          }
+        } else {
+          // Update previous position before the NPC collides with the wall
+          previouspos[id] = npc.object3D.position.clone(); // Use clone to avoid reference issues
+        }
+
+        switch (direction[id]) {
+          case 1:
+            npc.object3D.position.x -= npcvel;
+            break;
+          case 2:
+            npc.object3D.position.z -= npcvel;
+            break;
+          case 3:
+            npc.object3D.position.x += npcvel;
+            break;
+          case 4:
+            npc.object3D.position.z += npcvel;
+            break;
+        }
+      }
+
     </script>
   </body>
 </html>

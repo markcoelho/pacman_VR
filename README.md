@@ -1,6 +1,6 @@
 # Pacman VR
 
-**Pacman VR** is a virtual reality reimagining of the classic Pac-Man game, developed as a project for the **Master’s Degree in Design and Multimedia** at the **University of Coimbra's VR Lab**. This project was created as part of the **Interactive Virtual Reality Environments** course, taught by **Professor Jorge Cardoso**.
+**Pacman VR** is a virtual reality reimagining of the classic Pac-Man game, developed as a project for the **Master’s Degree in Design and Multimedia** at the **University of Coimbra's VR Lab**. This project was created as part of the **Interactive Virtual Reality Environments** class, taught by **Professor Jorge Cardoso**.
 
 ## About the Project
 

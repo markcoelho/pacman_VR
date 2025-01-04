@@ -7,3 +7,5 @@ One of the key features I aimed to incorporate was arm-based locomotion, inspire
 The project is designed for home gamers equipped with a VR headset and controllers, along with an internet connection, making it accessible and easy to enjoy.
 
 Live link: https://pacman-vr.glitch.me/
+
+Gameplay video: https://youtu.be/uBDAkE62t_g

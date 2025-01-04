@@ -1,11 +1,37 @@
-This project was developed for the Interactive Virtual Reality Environments course, part of the Master’s Degree in Design and Multimedia at the University of Coimbra. The primary objective of the class was to reimagine a classic game in a virtual reality (VR) format. I chose Pac-Man—one of the most iconic and beloved games of all time—due to its timeless appeal and widespread recognition.
+# Pacman VR
 
-To bring this project to life, I used A-Frame, a web-based framework built on top of Three.js for creating 3D environments. A-Frame, combined with the Glitch platform, made it easy to prototype and deploy a functional VR experience quickly. The framework’s well-documented features and robust VR integration allowed for a smooth development process.
+**Pacman VR** is a virtual reality reimagining of the classic Pac-Man game, developed as a project for the **Master’s Degree in Design and Multimedia** at the **University of Coimbra's VR Lab**. This project was created as part of the **Interactive Virtual Reality Environments** course, taught by **Professor Jorge Cardoso**.
 
-One of the key features I aimed to incorporate was arm-based locomotion, inspired by the movement mechanics in the popular VR game Gorilla Tag. This approach to movement not only adds a layer of fun and novelty but, in my opinion, also helps reduce motion sickness, compared to traditional joystick-based movement. By requiring players to move their arms to navigate the game world, the experience becomes more immersive and physically engaging.
+## About the Project
 
-The project is designed for home gamers equipped with a VR headset and controllers, along with an internet connection, making it accessible and easy to enjoy.
+The primary goal of this project was to take a beloved classic and adapt it into a virtual reality (VR) format, combining timeless gameplay with immersive technology. I chose Pac-Man for its universal appeal and iconic status in gaming history.
 
-Live link: https://pacman-vr.glitch.me/
+### Key Features
+- **Arm-Based Locomotion**  
+  Inspired by the movement mechanics of the popular VR game *Gorilla Tag*, this innovative locomotion method uses arm movements for navigation. This not only makes the game more engaging and physically interactive but also helps reduce motion sickness compared to traditional joystick controls.
+  
+- **Web-Based Accessibility**  
+  Built with [A-Frame](https://aframe.io/), a web-based framework powered by [Three.js](https://threejs.org/), the game can be played directly in a browser. Hosting on [Glitch.com](https://glitch.com) allows for quick prototyping and easy deployment.
 
-Gameplay video: https://youtu.be/uBDAkE62t_g
+- **Accessible Gameplay**  
+  Designed for home gamers with VR headsets and controllers, the game can be played online without the need for additional downloads or installations.
+
+## Tools and Technologies
+- **Framework**: [A-Frame](https://aframe.io/)
+- **Hosting Platform**: [Glitch](https://glitch.com)
+- **Development Environment**: Web-based tools for quick iteration and testing.
+
+## How to Play
+- **Play Now**: [pacman-vr.glitch.me](https://pacman-vr.glitch.me/)
+- **Source Code**: [GitHub Repository](https://github.com/markcoelho/aromashooter_vr_testing)
+- **Gameplay Video**: [Watch on YouTube](https://youtu.be/uBDAkE62t_g)
+
+## Credits
+- **Developer**: Mark Coelho  
+- **Supervisor**: Professor Jorge Cardoso  
+- **Course**: Interactive Virtual Reality Environments  
+- **Institution**: University of Coimbra  
+
+---
+
+Enjoy a modern twist on a gaming classic in the world of virtual reality. Try it out now and experience Pac-Man like never before!

@@ -1,7 +1,10 @@
+*.pem
+*.pub
+ssh
+ssh.pub
+key
+key.pem
+key.pub
 /cert.pem
 /key.pem
 /node_modules
-ssh
-ssh.pub
-key.pem
-key

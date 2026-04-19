@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/aframe-aabb-collider-component@3.2.2/dist/aframe-aabb-collider-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
     
+    
   </head>
   <body>
     
@@ -16,28 +17,28 @@
 
       <a-assets>
         
-      <audio  preload="auto" crossorigin="anonymous" id="pointsound" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/point.mp3?v=1733015884770" ></audio>
+      <audio  preload="auto" crossorigin="anonymous" id="pointsound" src="assets/point.wav" ></audio>
 
-      <audio  preload="auto" crossorigin="anonymous" id="step" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/step.mp3?v=1733012681752" ></audio>
+      <audio  preload="auto" crossorigin="anonymous" id="step" src="assets/step.wav" ></audio>
         
-      <audio  preload="auto" crossorigin="anonymous" id="death" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/death.mp3?v=1733029436935" ></audio> 
+      <audio  preload="auto" crossorigin="anonymous" id="death" src="assets/gameover.wav" ></audio> 
         
-      <audio  preload="auto" lop="true" crossorigin="anonymous" id="powerup" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/powerup.mp3?v=1734401918945" ></audio> 
+      <audio  preload="auto" lop="true" crossorigin="anonymous" id="powerup" src="assets/powerup.wav" ></audio> 
         
         
-        <img id="floorTexture" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/1f.png?v=1732126559919" crossorigin="anonymous">
+        <img id="floorTexture" src="assets/floortexture.png" crossorigin="anonymous">
         <!-- Add the 3D model -->
-        <a-asset-item id="mapModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/mapa1.glb?v=1732276864027"></a-asset-item>
+        <a-asset-item id="mapModel" src="assets/pacmanwalls.glb"></a-asset-item>
         <!-- path 3D model -->
-        <a-asset-item id="pathModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/path1.glb?v=1732278337946"></a-asset-item>
+        <a-asset-item id="pathModel" src="assets/pacmanpath.glb"></a-asset-item>
         
         <!-- npc 3D model -->
-        <a-asset-item id="npcModel" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/npc.glb?v=1732277433921"></a-asset-item>
+        <a-asset-item id="npcModel" src="assets/white.glb"></a-asset-item>
         
-        <a-asset-item id="npcPink" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/pink.glb?v=1733009325468"></a-asset-item>
-        <a-asset-item id="npcRed" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/red.glb?v=1733009323239"></a-asset-item>
-        <a-asset-item id="npcYellow" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/yellow.glb?v=1733009324191"></a-asset-item>
-        <a-asset-item id="npcBlue" src="https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/blue.glb?v=1733009324983"></a-asset-item>
+        <a-asset-item id="npcPink" src="assets/pink.glb"></a-asset-item>
+        <a-asset-item id="npcRed" src="assets/red.glb"></a-asset-item>
+        <a-asset-item id="npcYellow" src="assets/yellow.glb"></a-asset-item>
+        <a-asset-item id="npcBlue" src="assets/blue.glb"></a-asset-item>
         
         <!--  scared
           https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/scared.glb?v=1734306744594
@@ -52,13 +53,13 @@
       <a-light type="directional" color="#fff" position="1 1 1"></a-light>
 
       <!-- Adjusted Ground Position with Texture -->
-      <a-plane id="ground" position="0 0.8 0" rotation="-90 0 0" width="200" height="200" material="src: #floorTexture; repeat: 200 200;"></a-plane>
+      <a-plane id="ground" position="0 1 0" rotation="-90 0 0" width="200" height="200" material="src: #floorTexture; repeat: 50 50;"></a-plane>
 
       <!-- Add the 3D model to the scene -->
       <a-entity  gltf-model="#mapModel" position="-9 0.8 5" scale="1 1 1"></a-entity>
       
        <!-- Add the path to the scene -->
-      <a-entity nav-mesh class="collidable"  gltf-model="#pathModel" position="-9 -1 5" scale="1 1 1"></a-entity>
+      <a-entity nav-mesh class="collidable"   gltf-model="#pathModel" position="-9 -1 5" scale="1 1 1"></a-entity>
 
       <!-- Controller 1 (Left Hand) -->
       <a-entity id="controller1" tracked-controls="controller: 0; hand: left;"></a-entity>
@@ -67,29 +68,42 @@
       
       
       <!-- npc ghost -->
-      <a-entity id="pink" class="npcs" data-aabb-collider-dynamic gltf-model="#npcPink"  position="-33 1.8 -17" scale="0.2 0.2 0.2">
-          <a-entity id="pinkray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
-      </a-entity>
-      
       <!-- npc ghost -->
-      <a-entity id="red" class="npcs" data-aabb-collider-dynamic gltf-model="#npcRed"  position="15 1.8 -17" scale="0.2 0.2 0.2">
-          <a-entity id="redray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      <a-entity id="pink" class="npcs" data-aabb-collider-dynamic gltf-model="#npcPink" position="-33 1.8 -17" scale="0.08 0.08 0.08">
+        <a-entity id="pinkray_front" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="-10 0 0" rotation="-90 0 0"><a-sphere radius="0.1" color="red"></a-sphere></a-entity>
+        <a-entity id="pinkray_left" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -10" rotation="-90 0 0"><a-sphere radius="0.1" color="red"></a-sphere></a-entity>
+        <a-entity id="pinkray_right" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 10" rotation="-90 0 0"><a-sphere radius="0.1" color="red"></a-sphere></a-entity>
+        <a-entity id="pinkray_back" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="10 0 0" rotation="-90 0 0"><a-sphere radius="0.1" color="red"></a-sphere> </a-entity>
       </a-entity>
-      
+
       <!-- npc ghost -->
-      <a-entity id="yellow" class="npcs" data-aabb-collider-dynamic gltf-model="#npcYellow"  position="15 1.8 32" scale="0.2 0.2 0.2">
-          <a-entity id="yellowray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      <a-entity id="red" class="npcs" data-aabb-collider-dynamic gltf-model="#npcRed" position="15 1.8 -17" scale="0.08 0.08 0.08">
+        <a-entity id="redray_front" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="-10 0 0" rotation="-90 0 0"></a-entity>
+        <a-entity id="redray_left" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -10" rotation="-90 0 0"></a-entity>
+        <a-entity id="redray_right" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 10" rotation="-90 0 0"></a-entity>
+        <a-entity id="redray_back" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="10 0 0" rotation="-90 0 0"></a-entity>
       </a-entity>
-      
+
       <!-- npc ghost -->
-      <a-entity id="blue" class="npcs" data-aabb-collider-dynamic gltf-model="#npcBlue"  position="-33 1.8 32" scale="0.2 0.2 0.2">
-          <a-entity id="blueray"  collider-check raycaster="objects: .collidable; showLine:false;" position="-6 0 0" rotation="-90 0 0"></a-entity>
+      <a-entity id="yellow" class="npcs" data-aabb-collider-dynamic gltf-model="#npcYellow" position="15 1.8 32" scale="0.08 0.08 0.08">
+        <a-entity id="yellowray_front" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="-10 0 0" rotation="-90 0 0"></a-entity>
+        <a-entity id="yellowray_left" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -10" rotation="-90 0 0"></a-entity>
+        <a-entity id="yellowray_right" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 10" rotation="-90 0 0"></a-entity>
+        <a-entity id="yellowray_back" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="10 0 0" rotation="-90 0 0"></a-entity>
+      </a-entity>
+
+      <!-- npc ghost -->
+      <a-entity id="blue" class="npcs" data-aabb-collider-dynamic gltf-model="#npcBlue" position="-33 1.8 32" scale="0.08 0.08 0.08">
+        <a-entity id="blueray_front" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="-10 0 0" rotation="-90 0 0"></a-entity>
+        <a-entity id="blueray_left" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -10" rotation="-90 0 0"></a-entity>
+        <a-entity id="blueray_right" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 10" rotation="-90 0 0"></a-entity>
+        <a-entity id="blueray_back" class="ghostray" collider-check raycaster="objects: .collidable; showLine:false;" position="10 0 0" rotation="-90 0 0"></a-entity>
       </a-entity>
       
       
       
       <!-- Parent Entity for Character (Grouping the camera and two spheres)   position="-36 0 2" -->
-      <a-entity  id="character" position="-36 0 2" >
+      <a-entity  id="character" position="-36 0 5" rotation="0 0 0" >
         
         <a-entity 
                   id="characterhitbox" 
@@ -106,9 +120,9 @@
                   > </a-entity>
         
         <!-- VR Camera (Head of the character) -->
-        <a-entity id="cameraHead" camera look-controls wasd-controls position="0 0 0"> 
+        <a-entity id="cameraHead" camera look-controls wasd-controls position="0 2 0"> 
           
-         <a-text
+          <a-text
                  id="score"
             position="0 -0.12 -0.28"
                  rotation="-20 0 0"
@@ -121,7 +135,7 @@
                  id="food"
             position="0 -0.05 -0.28"
                  rotation="-20 0 0"
-            value="FOOD: 0 / 190"
+            value="FOOD: 0 / 240"
             width="0.4"
                  color="white"
                  
@@ -155,19 +169,39 @@
               
       
           <!--food placer--><!--food placer--><!--food placer--><!--food placer-->
-          <!--<a-entity food-placer id="foodplacer" aabb-collider="interval:5; enabled:true; debug:true; objects: .food"  position="-34 2 -23">
+          <!--<a-entity food-placer id="foodplacer" aabb-collider="interval:5; enabled:true; debug:true; objects: .food;"  position="-34 9 -20">-->
+          <!--
+            <a-entity food-placer id="foodplacer" position="-34 9 -20">
             <a-entity material="color: red"></a-entity>
-            <a-entity id="foodplacer1"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 0" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer2"  collider-check raycaster="objects: .collidable; showLine:true;" position="0 0 1.6" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer3"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 0" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer4"  collider-check raycaster="objects: .collidable; showLine:true;" position="0 0 -1.6" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer5"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 1.6" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer6"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 1.6" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer7"  collider-check raycaster="objects: .collidable; showLine:true;" position="1.6 0 -1.6" rotation="-90 0 0"></a-entity>
-            <a-entity id="foodplacer8"  collider-check raycaster="objects: .collidable; showLine:true;" position="-1.6 0 -1.6" rotation="-90 0 0"></a-entity>
-          </a-entity> -->
+            <a-entity id="foodplacer1" collider-check raycaster="objects: .collidable; showLine:false;" position="1.2 0 0" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer2" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer3" collider-check raycaster="objects: .collidable; showLine:false;" position="-1.2 0 0" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer4" collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer5" collider-check raycaster="objects: .collidable; showLine:false;" position="1.2 0 1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer6" collider-check raycaster="objects: .collidable; showLine:false;" position="-1.2 0 1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer7" collider-check raycaster="objects: .collidable; showLine:false;" position="1.2 0 -1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+            <a-entity id="foodplacer8" collider-check raycaster="objects: .collidable; showLine:false;" position="-1.2 0 -1.2" rotation="-90 0 0">
+              <a-sphere radius="0.1" color="red"></a-sphere>
+            </a-entity>
+          </a-entity>
+          -->
       
       <!--foods foods foods foods -->
+      
       <a-entity id="foods">
         
       </a-entity>
@@ -214,7 +248,9 @@
   },
 
   tick: function () {
+  if (raysout.length > 0) {
     console.log(raysout);
+  }
     
     let cameraHead = this.data.target;
     let element = this.el;
@@ -309,16 +345,7 @@
           let headcoliding=false;
       
       let prevcharpos;
-      
-      
-      /*init food placer
-          let colide_food=false;
-          let colide_wall=false;
-          let foodplacer = document.querySelector('#foodplacer');
-              let position = foodplacer.object3D.position;
-              position.y-=1;
-          let zmove=false;*/
-
+  
       
       // Fetch positions from the food.txt file
               fetch('food.txt')
@@ -360,12 +387,12 @@
           let poweruptimer;
           let end=false;
       
-          const scaredModelURL = 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/scared.glb?v=1734306744594';
+          const scaredModelURL = 'assets/white.glb';
           const npcModels = {
-            pink: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/pink.glb?v=1733009325468',
-            red: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/red.glb?v=1733009323239',
-            yellow: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/yellow.glb?v=1733009324191',
-            blue: 'https://cdn.glitch.global/72322a5a-f6d0-455e-ae56-a615c8051cde/blue.glb?v=1733009324983'
+            pink: 'assets/pink.glb',
+            red: 'assets/red.glb',
+            yellow: 'assets/yellow.glb',
+            blue: 'assets/blue.glb'
           };
 
           AFRAME.registerComponent('tick', {
@@ -377,7 +404,7 @@
                   // Increase the food count and score
                   food++;
                   score += 10;
-                  document.getElementById('food').setAttribute('value', 'FOOD: ' + food + ' / 190');
+                  document.getElementById('food').setAttribute('value', 'FOOD: ' + food + ' / 240');
                   document.getElementById('score').setAttribute('value', 'SCORE: ' + score);
                   evt.target.object3D.position.x = 9999; // Move the food item out of the scene
 
@@ -418,8 +445,8 @@
                     }, 15000);
                   }
 
-                  // Check if the food count reaches 190
-                  if (food >= 190) {
+                  // Check if the food count reaches 240
+                  if (food >= 240) {
                     end=true;
                     showFinalScore();
                   }
@@ -520,11 +547,11 @@ if (evt.target.className.includes("npcs")) {
           scoreText.setAttribute('color', 'white');
           scoreText.setAttribute('value', 'SCORE: ' + score);
           foodText.setAttribute('color', 'white');
-          foodText.setAttribute('value', 'FOOD: ' + food + ' / 190');
+          foodText.setAttribute('value', 'FOOD: ' + food + ' / 240');
 
           // Reset character position
           const character = document.getElementById('character');
-          character.setAttribute('position', '-36 0 2');
+          character.setAttribute('position', '-36 0 5');
 
           // Reset NPC positions
           document.getElementById('pink').setAttribute('position', '-33 1.8 -17');
@@ -622,7 +649,7 @@ if (evt.target.className.includes("npcs")) {
       function resetCharacterPosition() {
         // Reset character position to original
         const character = document.getElementById('character');
-        character.setAttribute('position', '-36 0 2');
+        character.setAttribute('position', '-36 0 5');
 
         // Reset the score text to default
         const scoreText = document.getElementById('score');
@@ -630,7 +657,7 @@ if (evt.target.className.includes("npcs")) {
         scoreText.setAttribute('color', 'white');
         scoreText.setAttribute('value', 'SCORE: ' + score);
         foodText.setAttribute('color', 'white');
-        foodText.setAttribute('value', 'FOOD: ' + food + "/ 190");
+        foodText.setAttribute('value', 'FOOD: ' + food + "/ 240");
       }
       
       
@@ -871,67 +898,7 @@ if (evt.target.className.includes("npcs")) {
 
         }
         
-        //FOOD PLACER FOOD PLACER FOOD PLACER
-          /*
-              //food placer script
-              if(foodplacer.object3D.position.x>20){
-                foodplacer.object3D.position.x=-34;
-                zmove=true;
-                colide_food=true;
-              }
-          
-              if(zmove){
-                foodplacer.object3D.position.z-=0.01;
-                if(colide_food==false){zmove=false;}
-              }else{
-                foodplacer.object3D.position.x+=0.03;
-              }
-          
-              if(colide_food==false && colide_wall==false){
-                let food = document.createElement('a-entity');
-                food.setAttribute('geometry', 'primitive: sphere; radius: 0.2');
-                food.setAttribute('material', 'color: red');
-                food.setAttribute('position', position);
-                
-                // Assuming position is an object with x, y, z properties
-                foodpos.push({x: position.x, y: position.y, z: position.z});
-                console.log(foodpos);
-                
-                
-                food.setAttribute('class', 'food');
-                document.querySelector('#foods').appendChild(food);
-                colide_food=true;
-              }
-
-              this.el.addEventListener('hitstart', function (evt) {
-                colide_food=true;
-                //console.log("colide food "+colide_food);
-              });
-              this.el.addEventListener('hitend', function (evt) {
-                colide_food=false;
-                //console.log("colide food "+colide_food);
-              });
-          
-          
-          
-          //parou de colidir com uma comida, mas está a colidir com uma parede?
-                //se sim, entao nao pode fazer mais comida
-            if (raysout.includes("foodplacer1") ||
-                  raysout.includes("foodplacer2") ||
-                  raysout.includes("foodplacer3") ||
-                  raysout.includes("foodplacer4") ||
-                  raysout.includes("foodplacer5") ||
-                  raysout.includes("foodplacer6") ||
-                  raysout.includes("foodplacer7") ||
-                  raysout.includes("foodplacer8")) {
-                  colide_wall=true;
-                  //console.log("colide wall "+colide_wall);
-                }else{
-                  colide_wall=false;
-                  //console.log("colide wall "+colide_wall);
-                }
-          
-                */
+        
 
           
       });
@@ -939,51 +906,52 @@ if (evt.target.className.includes("npcs")) {
       
       
       
-      const npcvel = 0.03;
+      const npcvel = 0.5;
 
       let direction = { npc: 1, pink: 1, red: 1, yellow: 1, blue: 1 };
       let previouspos = { npc: null, pink: null, red: null, yellow: null, blue: null };
 
       function npcmovement(npc) {
         const id = npc.id;
-        const childId = npc.children[0].id;
+        const rays = npc.querySelectorAll('.ghostray');
+        let isColliding = false;
         
-        if (raysout.includes(childId)) {
-          
-          npc.object3D.position.copy(previouspos[id]); // Use copy to avoid reference issues
-          let randomInt = Math.floor(Math.random() * 4) + 1; // Generates a random integer from 1 to 4
-          direction[id] = randomInt;
-
-          if (randomInt == 1) {
-            npc.object3D.rotation.y = 0;
-          } else if (randomInt == 2) {
-            npc.object3D.rotation.y = -Math.PI / 2;
-          } else if (randomInt == 3) {
-            npc.object3D.rotation.y = -Math.PI;
-          } else if (randomInt == 4) {
-            npc.object3D.rotation.y = Math.PI / 2;
+        rays.forEach(ray => {
+          if (raysout.includes(ray.id)) {
+            isColliding = true;
           }
+        });
+        
+        if (isColliding) {
+          // Revert to previous position
+          npc.object3D.position.copy(previouspos[id]);
+          
+          // Pick a new random direction that's not the same as current
+          let oldDirection = direction[id];
+          let randomInt;
+          do {
+            randomInt = Math.floor(Math.random() * 4) + 1;
+          } while (randomInt === oldDirection);
+          direction[id] = randomInt;
+          
+          if (randomInt == 1) npc.object3D.rotation.y = 0;
+          else if (randomInt == 2) npc.object3D.rotation.y = -Math.PI / 2;
+          else if (randomInt == 3) npc.object3D.rotation.y = -Math.PI;
+          else if (randomInt == 4) npc.object3D.rotation.y = Math.PI / 2;
         } else {
-          // Update previous position before the NPC collides with the wall
-          previouspos[id] = npc.object3D.position.clone(); // Use clone to avoid reference issues
+          // Save previous position before moving
+          previouspos[id] = npc.object3D.position.clone();
         }
 
         switch (direction[id]) {
-          case 1:
-            npc.object3D.position.x -= npcvel;
-            break;
-          case 2:
-            npc.object3D.position.z -= npcvel;
-            break;
-          case 3:
-            npc.object3D.position.x += npcvel;
-            break;
-          case 4:
-            npc.object3D.position.z += npcvel;
-            break;
+          case 1: npc.object3D.position.x -= npcvel; break;
+          case 2: npc.object3D.position.z -= npcvel; break;
+          case 3: npc.object3D.position.x += npcvel; break;
+          case 4: npc.object3D.position.z += npcvel; break;
         }
       }
 
     </script>
   </body>
+  <!--<script src="food-placer.js"></script>-->
 </html>

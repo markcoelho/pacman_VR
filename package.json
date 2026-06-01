@@ -1,12 +1,25 @@
 {
   "name": "mindar-server",
   "version": "1.0.0",
+  "description": "**Pacman VR** is a virtual reality reimagining of the classic Pac-Man game, developed as a project for the **Master’s Degree in Design and Multimedia** at the **University of Coimbra's VR Lab**. This project was created as part of the **Interactive Virtual Reality Environments** class, taught by **Professor Jorge Cardoso**.",
+  "homepage": "https://github.com/markcoelho/pacman_VR#readme",
+  "bugs": {
+    "url": "https://github.com/markcoelho/pacman_VR/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markcoelho/pacman_VR.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "food-placer.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "express": "^4.22.2",
     "https": "^1.0.0",
     "selfsigned": "^2.1.1"
   }

@@ -165,6 +165,31 @@
           <a-entity id="rightzneg"  collider-check raycaster="objects: .collidable; showLine:false;" position="0 0 -0.1" rotation="-90 0 0"></a-entity>
         </a-entity>
 
+         <!-- Sphere for Right Hand -->
+        <a-sound
+        id="stepsound"
+        sound="src:#step; volume: 7; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="pointmakesound"
+        sound="src:#pointsound; volume: 10; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="deathsound"
+        sound="src:#death; volume: 10; poolSize: 42"
+      >
+      </a-sound>
+      
+      <a-sound
+        id="powerupsound"
+        sound="src:#powerup; volume: 6; poolSize: 42; loop: true"
+      >
+      </a-sound>
+
       </a-entity>
               
       
@@ -207,29 +232,7 @@
       </a-entity>
       
       
-      <a-sound
-        id="stepsound"
-        sound="src:#step; volume: 60; poolSize: 42"
-      >
-      </a-sound>
       
-      <a-sound
-        id="pointmakesound"
-        sound="src:#pointsound; volume: 60; poolSize: 42"
-      >
-      </a-sound>
-      
-      <a-sound
-        id="deathsound"
-        sound="src:#death; volume: 60; poolSize: 42"
-      >
-      </a-sound>
-      
-      <a-sound
-        id="powerupsound"
-        sound="src:#powerup; volume: 10; poolSize: 42; loop: true"
-      >
-      </a-sound>
       
 
     </a-scene>
@@ -717,8 +720,8 @@ if (evt.target.className.includes("npcs")) {
           const drag = 0.01;
           
           if (!lefthandonsurface && !righthandonsurface) {
-              character.object3D.position.x += velx /100;
-              character.object3D.position.z += velz /100;
+              character.object3D.position.x += velx /10;
+              character.object3D.position.z += velz /10;
               //console.log(velx, velx);
           }
           
